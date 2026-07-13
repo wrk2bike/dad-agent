@@ -11,9 +11,19 @@ variable "project_name" {
 }
 
 variable "dad_joke_user_agent" {
-  description = "Custom User-Agent header the agent sends to icanhazdadjoke.com, per their API etiquette request. Include an app name and contact info/URL."
+  description = <<-EOT
+    Custom User-Agent header the agent sends to icanhazdadjoke.com, per their
+    API etiquette request. No default on purpose - set your own app
+    name/contact info (e.g. your email or a repo URL) in a .tfvars file
+    rather than committing it here. Example:
+    dad_joke_user_agent = "My Dad Joke Agent (contact: me@example.com)"
+  EOT
   type        = string
-  default     = "Bedrock AgentCore Dad Joke Agent (contact: seankelleypegg@gmail.com)"
+
+  validation {
+    condition     = length(trimspace(var.dad_joke_user_agent)) > 0
+    error_message = "Set dad_joke_user_agent in a .tfvars file (see variables.tf) - it must identify your app to icanhazdadjoke.com."
+  }
 }
 
 variable "idle_runtime_session_timeout" {

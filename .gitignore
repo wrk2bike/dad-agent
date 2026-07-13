@@ -4,3 +4,6 @@
 *.tfplan
 crash.log
 build/
+*.tfvars
+*.tfvars.json
+!*.tfvars.example

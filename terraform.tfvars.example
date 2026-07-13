@@ -1,0 +1,3 @@
+# Copy this file to terraform.tfvars (gitignored) and fill in your own values.
+
+dad_joke_user_agent = "My Dad Joke Agent (contact: me@example.com)"

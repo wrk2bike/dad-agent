@@ -42,6 +42,20 @@ and phrases the reply.
   a one-time manual step — Terraform has no resource for it. If you pick a different
   model, check its exact ID in the console's model catalog.
 
+## Configure
+
+Copy the example vars file and set your own contact info (this file is gitignored, so
+it won't end up in version control):
+
+```sh
+cp terraform.tfvars.example terraform.tfvars
+$EDITOR terraform.tfvars
+```
+
+`dad_joke_user_agent` has no default on purpose — icanhazdadjoke.com asks API users to
+identify themselves via User-Agent, so it should be *your* contact info, not whatever
+was baked into this repo. `terraform plan`/`apply` will refuse to run until it's set.
+
 ## Deploy
 
 ```sh
@@ -68,6 +82,13 @@ curl -s -X POST "$(terraform output -raw invoke_url)" \
   -H "Content-Type: application/json" \
   -H "X-Amzn-Bedrock-AgentCore-Runtime-Session-Id: $(uuidgen)$(uuidgen)" \
   -d '{"prompt": "Got any jokes about chickens?"}'
+
+# Not a joke request - the model should skip the tool entirely
+curl -s -X POST "$(terraform output -raw invoke_url)" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "X-Amzn-Bedrock-AgentCore-Runtime-Session-Id: $(uuidgen)$(uuidgen)" \
+  -d '{"prompt": "Hi, how are you?"}'
 ```
 
 Note: `X-Amzn-Bedrock-AgentCore-Runtime-Session-Id` must be at least 33 characters —
