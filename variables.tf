@@ -27,3 +27,15 @@ variable "max_lifetime" {
   type        = number
   default     = 1800
 }
+
+variable "bedrock_model_id" {
+  description = <<-EOT
+    Bedrock model (or cross-region inference profile) ID the agent uses to
+    decide when/what to search for. Requires model access to be enabled for
+    this model in the Bedrock console for your account/region first -
+    Terraform cannot grant that. Check the exact ID in the Bedrock console's
+    model catalog for your region.
+  EOT
+  type        = string
+  default     = "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+}

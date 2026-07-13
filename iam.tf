@@ -94,6 +94,20 @@ resource "aws_iam_role_policy" "agent_runtime" {
           "${aws_s3_bucket.agent_code.arn}/*",
         ]
       },
+      {
+        Sid    = "BedrockModelInvocation"
+        Effect = "Allow"
+        Action = [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream",
+        ]
+        # Cross-region inference profiles route to foundation models in other
+        # regions in the same geography, so both ARN types are granted.
+        Resource = [
+          "arn:aws:bedrock:*::foundation-model/*",
+          "arn:aws:bedrock:${var.aws_region}:${data.aws_caller_identity.current.account_id}:inference-profile/*",
+        ]
+      },
     ]
   })
 }

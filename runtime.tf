@@ -41,5 +41,7 @@ resource "aws_bedrockagentcore_agent_runtime" "dad_joke" {
 
   environment_variables = {
     DAD_JOKE_USER_AGENT = var.dad_joke_user_agent
+    BEDROCK_MODEL_ID    = var.bedrock_model_id
+    BEDROCK_REGION      = var.aws_region
   }
 }

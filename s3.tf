@@ -12,10 +12,32 @@ resource "aws_s3_bucket_public_access_block" "agent_code" {
   restrict_public_buckets = true
 }
 
+# boto3/botocore are pure Python (no compiled extensions), so a plain `pip
+# install --target` on any machine produces packages that run fine on
+# AgentCore Runtime's arm64 Amazon Linux environment - no cross-compilation
+# needed, unlike libraries with native code (numpy, pandas, etc.).
+resource "null_resource" "agent_dependencies" {
+  triggers = {
+    requirements_hash = filesha256("${path.module}/agent/requirements.txt")
+    main_py_hash      = filesha256("${path.module}/agent/main.py")
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -euo pipefail
+      rm -rf "${path.module}/build/package"
+      mkdir -p "${path.module}/build/package"
+      pip install --quiet --target "${path.module}/build/package" -r "${path.module}/agent/requirements.txt"
+      cp "${path.module}/agent/main.py" "${path.module}/build/package/main.py"
+    EOT
+  }
+}
+
 data "archive_file" "agent" {
   type        = "zip"
-  source_file = "${path.module}/agent/main.py"
+  source_dir  = "${path.module}/build/package"
   output_path = "${path.module}/build/deployment_package.zip"
+  depends_on  = [null_resource.agent_dependencies]
 }
 
 # Keying the object by the zip's own hash means every code change uploads to a
